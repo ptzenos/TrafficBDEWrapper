@@ -30,7 +30,7 @@ GetPredictions <- function(executor_number, total_executors){
   for (i in from_number:to_number){ 
     print("Iteration:")
     print(i)
-    pred <- try(kStepsForward(Data = Data, Link_id = OSM_Links[i,1], direction = OSM_Links[i,2], datetime = next_dt, predict = "Mean_speed", steps = 2),silent=FALSE) 
+    pred <- try(kStepsForward(Data = Data, Link_id = OSM_Links[i,1], direction = OSM_Links[i,2], datetime = next_dt, predict = "Mean_speed", steps = 1),silent=FALSE) 
     print("Prediction:")
     print(pred)	 
     if (class(pred) == "try-warning" || class(pred) == "try-error") {		
