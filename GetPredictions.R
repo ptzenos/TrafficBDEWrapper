@@ -1,5 +1,5 @@
 GetPredictions <- function(executor_number, total_executors){  
-  df = data.frame(matrix(vector(), 0, 6,dimnames=list(c(), c("link_id", "direction","exec","step","dt","Predicted"))),stringsAsFactors=F)				
+  df = data.frame(matrix(vector(), 0, 6,dimnames=list(c(), c("Link_id", "Direction","Exec_Timestamp","Step","Pred_Timestamp","Pred"))),stringsAsFactors=F)				
   #get traindata
   print("Getting OSM links...")
   OSM_Links <- data.table::fread("data/OSM_Main_Links.csv")
@@ -13,12 +13,12 @@ GetPredictions <- function(executor_number, total_executors){
   print(nrow(Data))
   
   #set next dt target
-  next_dt <- as.POSIXct(Data[which.max(as.POSIXct(Data$Date)),3]) + 900
+  next_dt <- as.POSIXct(Data[which.max(as.POSIXct(Data$Date)),3]) + 3600
   print("Calculating predictions for:")
   print(next_dt)
   
   #insert the same execution timestamp for all links
-  exec_tstamp <-Sys.time();
+  exec_tstamp <- floor_date(Sys.time(),unit="15 minutes")
   
   #for all the links, produce a prediction
   i <- 0;  
@@ -30,7 +30,7 @@ GetPredictions <- function(executor_number, total_executors){
   for (i in from_number:to_number){ 
     print("Iteration:")
     print(i)
-    pred <- try(kStepsForward(Data = Data, Link_id = OSM_Links[i,1], direction = OSM_Links[i,2], datetime = next_dt, predict = "Mean_speed", steps = 1),silent=FALSE) 
+    pred <- try(kStepsForward(Data = Data, Link_id = OSM_Links[i,1], direction = OSM_Links[i,2], datetime = next_dt, predict = "Mean_speed", steps = 4),silent=FALSE) 
     print("Prediction:")
     print(pred)	 
     if (class(pred) == "try-warning" || class(pred) == "try-error") {		
