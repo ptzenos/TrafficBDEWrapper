@@ -1,5 +1,9 @@
+library(TrafficBDE) #The prediction package (https://github.com/ptzenos/TrafficBDE) 
+library(lubridate) #allow usage of floor_date, ceiling_date
+
 GetPredictions <- function(executor_number, total_executors){  
-  df = data.frame(matrix(vector(), 0, 6,dimnames=list(c(), c("Link_id", "Direction","Exec_Timestamp","Step","Pred_Timestamp","Pred"))),stringsAsFactors=F)				
+  
+  df = data.frame(matrix(vector(), 0, 6, dimnames=list(c(), c("Link_id", "Direction","Exec_Timestamp","Step","Pred_Timestamp","Pred"))),stringsAsFactors=F)				
   #get traindata
   print("Getting OSM links...")
   OSM_Links <- data.table::fread("data/OSM_Main_Links.csv")
@@ -20,25 +24,24 @@ GetPredictions <- function(executor_number, total_executors){
   #insert the same execution timestamp for all links
   exec_tstamp <- floor_date(Sys.time(),unit="15 minutes")
   
-  #for all the links, produce a prediction
+  #Produce a prediction for every link
   i <- 0;  
-  print("This executor will handle links from:")
+  
   from_number <- (((nrow(OSM_Links)/total_executors)*(executor_number - 1)) + 1)
-  print("To:")
   to_number <- (((nrow(OSM_Links)/total_executors)*(executor_number - 1)) + (nrow(OSM_Links)/total_executors))  
+  print(paste("This executor will handle links from: ",from_number," to ", to_number,sep=""))
   
   for (i in from_number:to_number){ 
-    print("Iteration:")
-    print(i)
-    pred <- try(kStepsForward(Data = Data, Link_id = OSM_Links[i,1], direction = OSM_Links[i,2], datetime = next_dt, predict = "Mean_speed", steps = 4),silent=FALSE) 
-    print("Prediction:")
-    print(pred)	 
+    print(paste("Iteration: ",i," of ",nrow(OSM_Links),sep="" ))    
+    pred <- try(kStepsForward(Data = Data, Link_id = OSM_Links[i,1], direction = OSM_Links[i,2], datetime = next_dt, predict = "Mean_speed", steps = 4),silent=TRUE)     
     if (class(pred) == "try-warning" || class(pred) == "try-error") {		
       #smth went wrong, continue
+      print("Training failed")
     }
     else{
       #We got some results. Set exec_timestamp for all predictions produced in the current run
       #Comment the following line to include the actual exec_timestamp for each link in the returned dataset
+      print("Training successful")
       pred[,3] = as.character(exec_tstamp)
       df <- rbind(df,pred)	 
     }	
