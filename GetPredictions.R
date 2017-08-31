@@ -11,8 +11,8 @@ GetPredictions <- function(executor_number, total_executors){
   print("OK. The number of links is:")
   print(nrow(OSM_Links))
   
-  print("Getting latest train dataset...")
-  Data<-try(as.data.frame(read.table("http://160.40.63.115:23577/fcd/traindata.csv?offset=0&limit=-1", header = TRUE, sep = ";"),silent = TRUE))
+  print("Fetching the latest complete train dataset...")
+  Data<-try(as.data.frame(read.table("http://160.40.63.115:23577/fcd/traindata_complete.csv?offset=0&limit=-1", header = TRUE, sep = ";"),silent = TRUE))
   print("OK. The number of rows in this dataset was:")
   print(nrow(Data))
   
