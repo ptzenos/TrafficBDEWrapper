@@ -32,7 +32,7 @@ GetPredictions <- function(executor_number, total_executors){
   print(paste("This executor will handle links from: ",from_number," to ", to_number,sep=""))
   
   for (i in from_number:to_number){ 
-    print(paste("Iteration: ",i," of ",nrow(OSM_Links),sep="" ))    
+    print(paste("Iteration: ",i," of ",to_number,sep="" ))    
     pred <- try(kStepsForward(Data = Data, Link_id = OSM_Links[i,1], direction = OSM_Links[i,2], datetime = next_dt, predict = "Mean_speed", steps = 4),silent=TRUE)     
     if (class(pred) == "try-warning" || class(pred) == "try-error") {		
       #smth went wrong, continue
